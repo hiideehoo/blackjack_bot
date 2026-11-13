@@ -1,4 +1,4 @@
-const readline = import('readline-sync');
+import readline from 'readline-sync';
 import { Blackjack } from './blackjack.js';
 import { Shoe } from './shoe.js';
 
@@ -12,31 +12,64 @@ class Game {
             player.hand.push(cards.shoe.shift());
             dealer.hand.push(cards.shoe.shift());
         }
-        trueValue();
-        console.log(`Player's hand: [${player.hand}] (True Value: ${player.points}) \nDealer's hand: [${dealer.hand[0]},?]`);
 
-        function trueValue() {
-
-            let tens = player.hand.filter((card) => typeof card === "string").filter((face) => face != "A");
-            player.points += (10 * tens.length);
-
-            let numbers = player.hand.filter((card) => typeof card === "number");
-            for (let i = 0; i < numbers.length; i++) {
-                player.points += numbers[i];
-            }
-
-            let aces = player.hand.filter((card) => card === "A");
-            player.points += aces.length;
-            if (aces.length > 0 && player.points <= 11) {
-                player.points +=10
-            }
-
-            return player.points;
-        }
-
-        if (player.points === 21) {
+        dealer.trueValue();
+        player.trueValue();
+        console.log(`Dealer's hand: [${dealer.hand[0]},?] \nPlayer's hand: [${player.hand}] (${player.points})`);
+        if (dealer.points === 21 && player.points === 21) {
+            console.log(`Dealer reveals: [${dealer.hand}] (${dealer.points})`);
+            console.log("Push. Your stake is returned.")
+        } else if (dealer.points === 21 && player.points !== 21) {
+            console.log(`Dealer reveals: [${dealer.hand}] (${dealer.points})`);
+            console.log("House wins.");
+        } else if (player.points === 21 && dealer.points !== 21) {
             console.log("Blackjack! You win!");
+        } else {
+
+            let move = "";
+            do {
+                if (dealer.points === 21 && player.points === 21) {
+                    console.log("")
+                }
+                move = readline.question(`Hit or stay? \n>`);
+                if (move.toLowerCase().includes("hit")) {
+                    player.hand.push(cards.shoe.shift());
+                    player.trueValue();
+                    console.log(`Dealer's hand: [${dealer.hand[0]},?] \nPlayer's hand: [${player.hand}] (True Value: ${player.points})`);
+                }
+                if (player.points > 21) {
+                    move = "stay";
+                    console.log("Bust!");
+                }
+            } while (!move.toLowerCase().includes("stay"));
+            if (player.points <= 21) {
+                console.log(`Dealer reveals: [${dealer.hand}] (${dealer.points})`);
+                if (dealer.points < 17) {
+                console.log(`drawing...`);
+                    setTimeout(() => {
+                        do {
+                            dealer.hand.push(cards.shoe.shift());
+                            dealer.trueValue();
+                        } while (dealer.points < 17);
+                        console.log(`Dealer's hand: [${dealer.hand}] (${dealer.points}) \nPlayer's hand: [${player.hand}] (${player.points})`);
+                        finale();
+                    }, 2500);
+                } else {
+                    finale();
+                }
+            }
         }
+
+        function finale() {
+            if (dealer.points > 21 || player.points > dealer.points) {
+                console.log("You win!");
+            } else if (dealer.points === player.points) {
+                console.log("Push. Your stake is returned.");
+            } else {
+                console.log("House wins.");
+            }
+        }
+
     }
 }
 
