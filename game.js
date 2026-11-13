@@ -35,11 +35,13 @@ class Game {
                 if (move.toLowerCase().includes("hit")) {
                     player.hand.push(cards.shoe.shift());
                     player.trueValue();
-                    console.log(`Dealer's hand: [${dealer.hand[0]},?] \nPlayer's hand: [${player.hand}] (True Value: ${player.points})`);
+                    console.log(`Dealer's hand: [${dealer.hand[0]},?] \nPlayer's hand: [${player.hand}] (${player.points})`);
                 }
                 if (player.points > 21) {
                     move = "stay";
                     console.log("Bust!");
+                } else if (player.points === 21) {
+                    move = "stay";
                 }
             } while (!move.toLowerCase().includes("stay"));
             if (player.points <= 21) {
