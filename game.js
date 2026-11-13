@@ -28,9 +28,6 @@ class Game {
 
             let move = "";
             do {
-                if (dealer.points === 21 && player.points === 21) {
-                    console.log("")
-                }
                 move = readline.question(`Hit or stay? \n>`);
                 if (move.toLowerCase().includes("hit")) {
                     player.hand.push(cards.shoe.shift());
